@@ -1,0 +1,52 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+)
+
+func main() {
+	err := rootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func init() {
+	{{if .RootCmd.GoFlags}}
+		// root command flags
+		{{range .RootCmd.GoFlags}}
+			rootCmd.Flags().{{.Type}}P("{{.Name}}", "{{.Short}}", {{.Default}}, "{{.Help}}")
+		{{end}}
+	{{end}}
+	{{if .SubCommands}}
+		// sub-commands
+		{{range $cmd := .SubCommands}}
+			// {{.Name}}Cmd flags
+			{{if .GoFlags}}
+				{{range $flag := .GoFlags}}// TODO: if the cmd.Name has a suffix of "cmd" then don't add "Cmd" to the flag name
+					// TODO: if flag Default is a string it needs quoting, otherwise it should be inserted as is
+					{{$cmd.Name}}Cmd.Flags().{{$flag.Type}}P("{{$flag.Name}}", "{{$flag.Short}}", "{{$flag.Default}}", "{{$flag.Help}}")
+				{{end}}
+			{{end}}
+		{{end}}
+	{{end}}
+
+	// attach subcommands
+	{{range .SubCommands}}rootCmd.AddCommand({{.Name}}Cmd){{end}}
+}
+
+var rootCmd = &cobra.Command{
+	Use:   "{{.RootCmd.Name}}",
+	Short: "{{.RootCmd.Short}}",
+	Long: "{{.RootCmd.Long}}",
+	{{if ne .RootCmd.Body ""}}
+		Run: func(cmd *cobra.Command, args []string) {
+			{{.RootCmd.Body}}
+		},
+	{{end}}
+}
+
+{{template "subCmd" .}}

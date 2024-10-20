@@ -1,0 +1,17 @@
+{{ define "subCmd" }}
+   {{if .SubCommands}}
+       {{range $sub := .SubCommands}}
+           // {{$sub.Name}}Cmd represents the {{$sub.Name}} command
+           var {{$sub.Name}}Cmd = &cobra.Command{
+               Use:   "{{$sub.Name}}",
+               Short: "{{$sub.Short}}",
+               Long: "{{$sub.Long}}",
+               {{if ne $sub.Body ""}}
+                   Run: func(cmd *cobra.Command, args []string) {
+                       {{$sub.Body}}
+                   },
+               {{end}}
+           }
+           {{end}}
+    {{end}}
+{{ end }}
