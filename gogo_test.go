@@ -101,7 +101,7 @@ func TestRenderGoFmt(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = runGoFmt(target)
+	err = runGoFmt(nil, target)
 	if err != nil {
 		t.Fatal(err)
 	}

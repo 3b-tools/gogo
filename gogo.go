@@ -2,26 +2,16 @@ package gogo
 
 import (
 	"embed"
-	"github.com/bitfield/script"
+	"fmt"
+	"log"
 	"os"
 	"strings"
 	"text/template"
+
+	"github.com/3b-tools/gogo/run"
+
+	"github.com/bitfield/script"
 )
-
-/*
-thoughts on how this works:
-1. load a file with functions
-2. parse the file into functions
-3. generate the binary with
-
-
-3. find the function that matches the requested function
-4. parse arguments from the cmdLine or input into the desired types
-5. pass the arguments to the function
-
-Where does compilation come into play?
-How can I debug the process?
-*/
 
 //go:embed templates/*
 var templates embed.FS
@@ -47,6 +37,10 @@ type GoFlag struct {
 	Help    string // help text for the flag
 }
 
+func Build(log *log.Logger) {
+
+}
+
 func RenderTemplates(rd renderData) (string, error) {
 	tmpl, err := template.ParseFS(templates,
 		"templates/main.go.tmpl",
@@ -55,7 +49,6 @@ func RenderTemplates(rd renderData) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// make a string buffer to write to
 	outBuf := new(strings.Builder)
 	err = tmpl.Execute(outBuf, rd)
 	if err != nil {
@@ -70,7 +63,25 @@ func writeFile(location, input string) error {
 }
 
 // go fmt
-func runGoFmt(location string) error {
+func runGoFmt(log *log.Logger, location string) error {
 	_, err := script.Exec("go fmt " + location).String()
 	return err
+}
+
+func buildBinary(log *log.Logger, dir string) error {
+	//_ = run.CMD("go", "get").Dir(dir).Log().Run()
+	//err = run.CMD("go", "build").Dir(dir).Log().Run()
+	//if err != nil {
+	//	os.Remove(filepath.Join(dir, "bake"))
+	//	return fmt.Errorf("failed to build binary: %w", err)
+	//}
+	runLine := fmt.Sprintf("go get -d %s", dir)
+	//go get
+	getOutput, err := script.Exec(runLine).String()
+	if err != nil {
+		return fmt.Errorf("failed to get dependencies: %s : %w", getOutput, err)
+	}
+	// build
+	runLine = fmt.Sprintf("go build %s", dir)
+	return run.CMD(log, "go", "build").Dir(dir).Log().Run()
 }

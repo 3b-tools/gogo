@@ -1,7 +1,10 @@
 package testdata
 
-import "fmt"
-import "github.com/morganhein/gogo"
+import (
+	"fmt"
+
+	"github.com/3b-tools/gogo"
+)
 
 func BasicDescription(ctx gogo.Context) error {
 	ctx.SetDescription("set a description")

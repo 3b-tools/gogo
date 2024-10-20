@@ -1,7 +1,10 @@
 package testdata
 
-import "fmt"
-import gogo2 "github.com/morganhein/gogo"
+import (
+	"fmt"
+
+	gogo2 "github.com/3b-tools/gogo"
+)
 
 func AliasedDescription(ctx gogo2.Context) error {
 	ctx.SetDescription("set a description")

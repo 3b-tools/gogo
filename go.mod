@@ -1,4 +1,4 @@
-module github.com/morganhein/gogo
+module github.com/3b-tools/gogo
 
 go 1.23.2
 
